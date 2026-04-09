@@ -1,25 +1,30 @@
 # 📈 Stock Price Predictor
 
-> AI Internship Project — Codex Technologies  
-> Predict next-day stock closing prices using Machine Learning & Technical Indicators
+> AI Internship Project — Codex Technologies
+> Predicting next-day stock closing prices using Machine Learning & Technical Indicators
+
+![Python](https://img.shields.io/badge/Python-3.8+-blue?style=flat-square&logo=python)
+![Scikit-learn](https://img.shields.io/badge/Scikit--learn-ML-orange?style=flat-square&logo=scikit-learn)
+![Streamlit](https://img.shields.io/badge/Streamlit-Frontend-red?style=flat-square&logo=streamlit)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
 ---
 
 ## 🎯 Project Overview
 
-This project builds a **Stock Price Prediction model** that uses historical OHLCV data (Open, High, Low, Close, Volume) and **11 engineered technical indicators** to forecast the next trading day's closing price using **Linear Regression**.
+This project is a **Stock Price Prediction System** built as part of my AI Internship at **Codex Technologies**. It uses historical stock market data (OHLCV — Open, High, Low, Close, Volume) combined with **11 engineered technical indicators** to predict the next trading day's closing price using **Linear Regression**.
 
-It also includes a **Streamlit web app** with interactive charts, real-time model evaluation, and a **30-day future price forecast**.
+The project also features a fully interactive **Streamlit web application** with live charts, model evaluation metrics, and a **30-day future price forecast**.
 
 ---
 
-## 🖥️ Live Demo (Streamlit App)
+## 🖥️ Run the App
 
 ```bash
 streamlit run stock_app.py
 ```
 
-Browser mein automatically `http://localhost:8501` pe khul jayega.
+Opens automatically at `http://localhost:8501` in your browser.
 
 ---
 
@@ -28,9 +33,9 @@ Browser mein automatically `http://localhost:8501` pe khul jayega.
 ```
 stock-price-predictor/
 │
-├── stock_app.py        # Streamlit frontend + complete ML logic
-├── requirements.txt    # Python dependencies
-└── README.md           # Project documentation
+├── stock_app.py        ← Main file — Streamlit UI + complete ML logic
+├── requirements.txt    ← Python dependencies
+└── README.md           ← Project documentation
 ```
 
 ---
@@ -38,103 +43,111 @@ stock-price-predictor/
 ## 🧠 How It Works
 
 ### Step 1 — Data Generation
-500 realistic trading days simulate kiye (weekends exclude) with:
-- Upward trend + daily volatility
-- Momentum & mean reversion
-- Random market shock events (3% chance)
+Generates 500 realistic trading days (weekends excluded) using:
+- Long-term upward trend
+- Daily random volatility (Normal distribution)
+- Price momentum and mean reversion
+- Rare market shock events (3% probability)
 
-### Step 2 — Feature Engineering (11 Features)
+### Step 2 — Feature Engineering
 
-| Feature | Description |
-|---------|-------------|
-| MA 5 / 10 / 20 / 50 | Moving Averages — short & long term trend |
-| Momentum 5 / 10 | Price change speed over N days |
-| Volatility 10 / 20 | Rolling standard deviation (risk) |
-| RSI (14 day) | Relative Strength Index — overbought/oversold |
-| Bollinger Band Width | Market volatility channel width |
-| Volume Change | Daily trading activity momentum |
+The model doesn't use raw prices directly. Instead, **11 technical indicators** are computed:
 
-### Step 3 — Model Training
+| Feature | Formula | What It Signals |
+|---------|---------|----------------|
+| MA 5 / 10 / 20 / 50 | Rolling mean of Close over N days | Short & long-term trend direction |
+| Momentum 5 / 10 | (Close today − Close N days ago) / Close N | Speed and direction of price change |
+| Volatility 10 / 20 | Rolling standard deviation of Close | Daily risk and uncertainty |
+| RSI (14-day) | 100 − 100 / (1 + avg gain / avg loss) | Overbought (>70) or Oversold (<30) |
+| Bollinger Band Width | (Upper − Lower) / MA 20 | Volatility compression or expansion |
+| Volume Change | (Volume today − Volume yesterday) / yesterday | Trading activity momentum |
+
+### Step 3 — Model Pipeline
 
 ```
-Raw Data → Feature Engineering → Train/Test Split (80/20)
-    ↓
-MinMax Scaling → Linear Regression → Predict → Evaluate
+Raw OHLCV Data
+      ↓
+Feature Engineering (11 indicators)
+      ↓
+Train / Test Split — 80% / 20% (chronological, no shuffle)
+      ↓
+MinMax Scaling → [0, 1] range
+      ↓
+Linear Regression Training
+      ↓
+Predict → Evaluate → 30-Day Forecast
 ```
 
-> ⚠️ Important: Time-series data mein shuffle nahi kiya — chronological split use kiya
+> ⚠️ **Note:** Data is never shuffled — time-series integrity is preserved to prevent future data leakage into training.
 
-### Step 4 — Evaluation & Forecast
-- Model metrics: MAE, RMSE, MAPE, R² Score
-- 30-day iterative future price forecast
-- UP/DOWN direction with percentage change
+### Step 4 — Output
+- Evaluation metrics printed to screen
+- 3 dark-theme charts generated
+- 30-day iterative price forecast with UP/DOWN direction
 
 ---
 
-## 📊 Model Results
+## 📊 Model Performance
 
-| Metric | Value | Meaning |
-|--------|-------|---------|
-| **R² Score** | 0.9823 | 98.2% variance explained |
+| Metric | Value | Interpretation |
+|--------|-------|---------------|
+| **R² Score** | 0.9823 | Model explains 98.2% of price variance |
 | **MAE** | $2.14 | Average dollar error per prediction |
-| **RMSE** | $2.87 | Root mean squared error |
-| **MAPE** | 1.42% | Mean absolute percentage error |
+| **RMSE** | $2.87 | Penalizes large errors more than MAE |
+| **MAPE** | 1.42% | Only 1.42% average percentage error |
 
 ---
 
 ## 🖼️ App Features
 
-- ⚙️ **Sidebar Controls** — Ticker, trading days, start price, forecast days
-- 📉 **Chart 1** — Historical price + Moving Averages + Bollinger Bands
-- 🎯 **Chart 2** — Actual vs Predicted prices (test period)
-- ⚡ **Chart 3** — RSI Indicator with overbought/oversold zones
-- 📦 **Chart 4** — Volume (green/red bars)
-- 🔮 **Forecast Chart** — 30-day price prediction with confidence band
-- 📋 **Forecast Table** — Day-wise prices with UP/DOWN arrows
-- ⚖️ **Feature Weights** — Linear regression coefficient chart
-- 🗃️ **Dataset Preview** — Last 10 rows with all indicators
+| Feature | Description |
+|---------|-------------|
+| ⚙️ Sidebar Controls | Choose ticker, days, start price, forecast days |
+| 📉 Price Chart | Historical close + MA20 + MA50 + Bollinger Bands |
+| 🎯 Prediction Chart | Actual vs Predicted prices on the test set |
+| ⚡ RSI Chart | Overbought / Oversold zones visualized |
+| 📦 Volume Chart | Green/red volume bars per day |
+| 🔮 Forecast Chart | 30-day future price prediction with confidence band |
+| 📋 Forecast Table | Day-by-day prices with ▲ UP / ▼ DOWN arrows |
+| ⚖️ Feature Weights | Bar chart of Linear Regression coefficients |
+| 🗃️ Dataset Preview | Last 10 rows with all engineered indicators |
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Technology | Purpose |
-|------------|---------|
-| **Python 3.8+** | Core language |
-| **Scikit-learn** | Linear Regression, MinMaxScaler, evaluation metrics |
-| **Pandas** | Data manipulation, rolling calculations |
-| **NumPy** | Numerical computations, array operations |
-| **Matplotlib** | Chart generation (dark theme) |
-| **Streamlit** | Interactive web app frontend |
+| Library | Version | Purpose |
+|---------|---------|---------|
+| Python | 3.8+ | Core programming language |
+| Scikit-learn | ≥0.24 | Linear Regression, MinMaxScaler, metrics |
+| Pandas | ≥1.3 | Data manipulation and rolling calculations |
+| NumPy | ≥1.21 | Numerical operations and array math |
+| Matplotlib | ≥3.4 | Dark-theme chart generation |
+| Streamlit | ≥1.28 | Interactive browser-based frontend |
 
 ---
 
-## 🚀 Installation & Run
+## 🚀 Installation & Setup
 
-### 1. Clone the repository
-```bash
-git clone https://github.com/YOUR_USERNAME/stock-price-predictor.git
-cd stock-price-predictor
-```
 
-### 2. Install dependencies
+### 1. Install all dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Run the app
+### 2. Launch the Streamlit app
 ```bash
 streamlit run stock_app.py
 ```
 
-### 4. Open browser
+### 3. Open in browser
 ```
 http://localhost:8501
 ```
 
 ---
 
-## 📦 Requirements
+## 📦 requirements.txt
 
 ```
 numpy>=1.21.0
@@ -148,38 +161,49 @@ streamlit>=1.28.0
 
 ## 💡 Key Learnings
 
-1. **Feature Engineering** — Raw OHLCV data se 11 meaningful signals banana hi asli ML skill hai
-2. **No Shuffle in Time-Series** — Future data training mein kabhi leak nahi hona chahiye
-3. **MinMax Scaling Zaroori** — RSI (0-100) aur Momentum (0.02) bina scaling ke train nahi ho sakte
-4. **Evaluation Metrics** — R², MAE, RMSE ke bina model ka koi proof nahi hota
-5. **Streamlit** — Sirf Python se production-ready browser app ban jaata hai
+1. **Feature engineering matters more than the model** — 11 well-crafted indicators from raw OHLCV data gave 98.2% R² with simple Linear Regression.
+2. **Never shuffle time-series data** — chronological split is essential to prevent future data leaking into training.
+3. **Scaling is critical** — RSI ranges 0–100 while Momentum is ~0.02; MinMaxScaler normalizes both to [0,1] so neither dominates.
+4. **Evaluation proves the model works** — without R², MAE, and RMSE, there is no evidence the model is actually learning anything.
+5. **Streamlit removes the barrier** — a fully interactive ML web app in pure Python with no HTML, CSS, or JavaScript needed.
 
 ---
 
-## 🔧 To Use Real Stock Data (Optional Upgrade)
+## 🔧 Optional Upgrade — Use Real Stock Data
+
+Replace the `generate_stock_data()` call with one line using `yfinance`:
 
 ```python
 import yfinance as yf
 df = yf.download("AAPL", start="2020-01-01", end="2024-01-01")
 ```
 
-Bas `generate_stock_data()` ki jagah ye ek line use karo!
+Install yfinance:
+```bash
+pip install yfinance
+```
 
 ---
 
 ## 👨‍💻 Author
 
-**[Your Name]**  
-AI Intern — Codex Technologies  
-📧 vaishali@codectechnologies.in
+**[Pawan Singh]**
+AI Intern — Codex Technologies
+
+
 
 ---
 
 ## 📄 License
 
-This project is open source and available under the MIT License.
+This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-Made with ❤️ during AI Internship at Codex Technologies
-*Internship Project — ML Fundamentals*
+<div align="center">
+
+⭐ **If you found this project helpful, please give it a star!**
+
+Made with ❤️ during AI Internship at **Codex Technologies**
+
+</div>
