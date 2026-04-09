@@ -1,0 +1,4 @@
+- numpy        : Numerical computations
+- pandas       : Data manipulation
+- matplotlib   : Data visualization
+- scikit-learn : Linear Regression model
